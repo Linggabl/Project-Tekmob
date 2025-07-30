@@ -1,44 +1,44 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'productivity_model.dart';
+part of 'work_schedule_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class ProductivityModelAdapter extends TypeAdapter<ProductivityModel> {
+class WorkScheduleModelAdapter extends TypeAdapter<WorkScheduleModel> {
   @override
-  final int typeId = 2;
+  final int typeId = 3;
 
   @override
-  ProductivityModel read(BinaryReader reader) {
+  WorkScheduleModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return ProductivityModel(
-      task: fields[0] as String,
-      isCompleted: fields[1] as bool,
-      userEmail: fields[2] as String,
-      createdAt: fields[3] as DateTime,
-      deadline: fields[4] as DateTime?,
+    return WorkScheduleModel(
+      day: fields[0] as String,
+      time: fields[1] as String,
+      activity: fields[2] as String,
+      userEmail: fields[3] as String,
+      date: fields[4] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, ProductivityModel obj) {
+  void write(BinaryWriter writer, WorkScheduleModel obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)
-      ..write(obj.task)
+      ..write(obj.day)
       ..writeByte(1)
-      ..write(obj.isCompleted)
+      ..write(obj.time)
       ..writeByte(2)
-      ..write(obj.userEmail)
+      ..write(obj.activity)
       ..writeByte(3)
-      ..write(obj.createdAt)
+      ..write(obj.userEmail)
       ..writeByte(4)
-      ..write(obj.deadline);
+      ..write(obj.date);
   }
 
   @override
@@ -47,7 +47,7 @@ class ProductivityModelAdapter extends TypeAdapter<ProductivityModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ProductivityModelAdapter &&
+      other is WorkScheduleModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

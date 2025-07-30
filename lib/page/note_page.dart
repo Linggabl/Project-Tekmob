@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:task_manager_project_tekmob/models/note_model.dart';
+import 'note_detail_page.dart';
 
 class NotePage extends StatefulWidget {
   const NotePage({super.key});
@@ -22,6 +23,7 @@ class _NotePageState extends State<NotePage> {
 
   String selectedCategory = 'Semua';
   String selectedNoteCategory = 'Pribadi';
+
   final List<String> categories = [
     'Semua',
     'Pribadi',
@@ -96,9 +98,7 @@ class _NotePageState extends State<NotePage> {
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: selectedNoteCategory,
-                items: categories.where((e) => e != 'Semua').map((
-                  String category,
-                ) {
+                items: categories.where((e) => e != 'Semua').map((category) {
                   return DropdownMenuItem<String>(
                     value: category,
                     child: Text(category),
@@ -172,17 +172,31 @@ class _NotePageState extends State<NotePage> {
     _loadNotes();
   }
 
-  Color getCategoryColor(String category) {
-    switch (category) {
-      case 'Kuliah':
-        return Colors.deepPurple.shade100;
-      case 'Kerja':
-        return Colors.green.shade100;
-      case 'Lainnya':
-        return Colors.grey.shade300;
-      case 'Pribadi':
-      default:
-        return Colors.blue.shade100;
+  Color getCategoryColor(String category, bool isDark) {
+    if (isDark) {
+      switch (category) {
+        case 'Kuliah':
+          return const Color(0xFF4527A0);
+        case 'Kerja':
+          return const Color(0xFF2E7D32);
+        case 'Lainnya':
+          return const Color(0xFF546E7A);
+        case 'Pribadi':
+        default:
+          return const Color(0xFF1565C0);
+      }
+    } else {
+      switch (category) {
+        case 'Kuliah':
+          return const Color(0xFFD1C4E9);
+        case 'Kerja':
+          return const Color(0xFFC8E6C9);
+        case 'Lainnya':
+          return const Color(0xFFCFD8DC);
+        case 'Pribadi':
+        default:
+          return const Color(0xFFBBDEFB);
+      }
     }
   }
 
@@ -201,30 +215,71 @@ class _NotePageState extends State<NotePage> {
   }
 
   Widget _buildNoteCard(NoteModel note, int index) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = getCategoryColor(note.category, isDark);
+    final textColor = bgColor.computeLuminance() > 0.5
+        ? Colors.black
+        : Colors.white;
+
     return Card(
-      color: getCategoryColor(note.category),
+      color: bgColor,
       elevation: 3,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
-        leading: Icon(getCategoryIcon(note.category), color: Colors.black87),
+        onTap: () {
+          Navigator.of(context).push(
+            PageRouteBuilder(
+              transitionDuration: const Duration(milliseconds: 300),
+              pageBuilder: (_, animation, __) => FadeTransition(
+                opacity: animation,
+                child: NoteDetailPage(note: note),
+              ),
+              transitionsBuilder: (_, animation, __, child) {
+                final offsetAnimation = Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation);
+                return SlideTransition(position: offsetAnimation, child: child);
+              },
+            ),
+          );
+        },
+        leading: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(getCategoryIcon(note.category), color: textColor),
+            const SizedBox(height: 4),
+            Text(
+              note.category,
+              style: TextStyle(
+                fontSize: 10,
+                color: textColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
         title: Text(
           note.title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(note.content),
+            Text(note.content, style: TextStyle(color: textColor)),
             const SizedBox(height: 6),
             Text(
               '📅 ${DateFormat.yMMMMd().format(note.createdAt)}',
-              style: const TextStyle(fontSize: 12, color: Colors.black54),
+              style: TextStyle(
+                fontSize: 12,
+                color: textColor.withAlpha((0.7 * 255).toInt()),
+              ),
             ),
           ],
         ),
         trailing: PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert),
+          icon: Icon(Icons.more_vert, color: textColor),
           onSelected: (value) {
             if (value == 'edit') {
               _addOrEditNote(existingNote: note, index: index);
@@ -232,9 +287,9 @@ class _NotePageState extends State<NotePage> {
               _deleteNote(note);
             }
           },
-          itemBuilder: (context) => [
-            const PopupMenuItem(value: 'edit', child: Text('Edit')),
-            const PopupMenuItem(value: 'delete', child: Text('Hapus')),
+          itemBuilder: (context) => const [
+            PopupMenuItem(value: 'edit', child: Text('Edit')),
+            PopupMenuItem(value: 'delete', child: Text('Hapus')),
           ],
         ),
       ),
@@ -272,7 +327,7 @@ class _NotePageState extends State<NotePage> {
                 const SizedBox(width: 12),
                 DropdownButton<String>(
                   value: selectedCategory,
-                  items: categories.map((String category) {
+                  items: categories.map((category) {
                     return DropdownMenuItem<String>(
                       value: category,
                       child: Text(category),

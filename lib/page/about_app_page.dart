@@ -85,9 +85,9 @@ class AboutAppPage extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('@linggabangun (Instagram)'),
+              title: const Text('@linggabgnl (Instagram)'),
               onTap: () {
-                _launchURL('https://instagram.com/linggabangun');
+                _launchURL('https://www.instagram.com/linggabgnl/');
               },
             ),
             ListTile(

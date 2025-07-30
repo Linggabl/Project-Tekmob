@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:task_manager_project_tekmob/main.dart';
 import 'package:task_manager_project_tekmob/models/user_model.dart';
 import 'package:task_manager_project_tekmob/page/login_page.dart';
+import 'package:task_manager_project_tekmob/page/daily_summary_page.dart'; // ⬅️ pastikan file ini ada
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -91,147 +92,9 @@ class _DashboardPageState extends State<DashboardPage> {
     const primaryColor = Color(0xFF5C6BC0);
 
     return DefaultTabController(
-      length: 3,
+      length: 1,
       child: Scaffold(
-        drawer: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.7,
-          child: Drawer(
-            backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 50),
-                        Center(
-                          child: CircleAvatar(
-                            radius: 34,
-                            backgroundImage:
-                                profileImagePath != null &&
-                                    profileImagePath!.isNotEmpty
-                                ? FileImage(File(profileImagePath!))
-                                : const AssetImage('assets/profile_avatar.png')
-                                      as ImageProvider,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Center(
-                          child: Text(
-                            'Hi, $currentUserName',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: TextButton.icon(
-                            onPressed: () async {
-                              await Navigator.pushNamed(
-                                context,
-                                '/edit_profile',
-                              );
-                              _loadUserData(); // refresh data
-                            },
-                            icon: const Icon(Icons.edit, size: 13),
-                            label: const Text(
-                              "Edit Profile",
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            style: TextButton.styleFrom(
-                              foregroundColor: primaryColor,
-                            ),
-                          ),
-                        ),
-                        const Divider(),
-                        SwitchListTile(
-                          title: Text(
-                            'Dark Mode',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          secondary: Icon(
-                            isDark ? Icons.dark_mode : Icons.light_mode,
-                            color: isDark ? Colors.white : Colors.black,
-                          ),
-                          value: isDark,
-                          onChanged: (value) {
-                            themeNotifier.value = value
-                                ? ThemeMode.dark
-                                : ThemeMode.light;
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(
-                            Icons.settings,
-                            color: isDark ? Colors.white : Colors.black,
-                          ),
-                          title: Text(
-                            'Pengaturan',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  "Fitur Pengaturan belum tersedia.",
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(
-                            Icons.info_outline,
-                            color: isDark ? Colors.white : Colors.black,
-                          ),
-                          title: Text(
-                            'Tentang Aplikasi',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.pop(context); // tutup drawer
-                            Navigator.pushNamed(
-                              context,
-                              '/about',
-                            ); // buka halaman about
-                          },
-                        ),
-                      ],
-                    ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.logout,
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                      title: Text(
-                        'Logout',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      onTap: _logout,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
+        drawer: _buildDrawer(isDark),
         appBar: AppBar(
           backgroundColor: isDark ? Colors.black : Colors.white,
           elevation: 1,
@@ -253,20 +116,24 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           centerTitle: true,
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: Icon(
+            IconButton(
+              icon: Icon(
                 Icons.calendar_today,
                 color: isDark ? Colors.white : Colors.black,
               ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const DailySummaryPage(), // ✅ pindah ke halaman ringkasan
+                  ),
+                );
+              },
             ),
           ],
           bottom: const TabBar(
-            tabs: [
-              Tab(text: 'My Task'),
-              Tab(text: 'In-progress'),
-              Tab(text: 'Completed'),
-            ],
+            tabs: [Tab(text: 'My Task')],
             labelColor: primaryColor,
             unselectedLabelColor: Colors.grey,
             indicatorColor: primaryColor,
@@ -319,13 +186,13 @@ class _DashboardPageState extends State<DashboardPage> {
                           icon: Icons.work,
                           title: 'Work',
                           backgroundColor: Colors.blue,
-                          onTap: () {},
+                          onTap: () => Navigator.pushNamed(context, '/work'),
                         ),
                         _buildTaskCard(
                           icon: Icons.bedtime,
                           title: 'Sleep',
                           backgroundColor: const Color(0xFFBA68C8),
-                          onTap: () {},
+                          onTap: () => Navigator.pushNamed(context, '/sleep'),
                         ),
                       ],
                     ),
@@ -333,19 +200,138 @@ class _DashboardPageState extends State<DashboardPage> {
                 ],
               ),
             ),
-            Center(
-              child: Text(
-                'Tugas yang sedang dikerjakan',
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-              ),
-            ),
-            Center(
-              child: Text(
-                'Tugas yang sudah selesai',
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-              ),
-            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawer(bool isDark) {
+    const primaryColor = Color(0xFF5C6BC0);
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.7,
+      child: Drawer(
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    const SizedBox(height: 50),
+                    Center(
+                      child: CircleAvatar(
+                        radius: 34,
+                        backgroundImage:
+                            profileImagePath != null &&
+                                profileImagePath!.isNotEmpty
+                            ? FileImage(File(profileImagePath!))
+                            : const AssetImage('assets/profile_avatar.png')
+                                  as ImageProvider,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Text(
+                        'Hi, $currentUserName',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: () async {
+                          await Navigator.pushNamed(context, '/edit_profile');
+                          _loadUserData();
+                        },
+                        icon: const Icon(Icons.edit, size: 13),
+                        label: const Text(
+                          "Edit Profile",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: primaryColor,
+                        ),
+                      ),
+                    ),
+                    const Divider(),
+                    SwitchListTile(
+                      title: Text(
+                        'Dark Mode',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      secondary: Icon(
+                        isDark ? Icons.dark_mode : Icons.light_mode,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                      value: isDark,
+                      onChanged: (value) {
+                        themeNotifier.value = value
+                            ? ThemeMode.dark
+                            : ThemeMode.light;
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(
+                        Icons.settings,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                      title: Text(
+                        'Pengaturan',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, '/settings');
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(
+                        Icons.info_outline,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                      title: Text(
+                        'Tentang Aplikasi',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, '/about');
+                      },
+                    ),
+                  ],
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.logout,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  onTap: _logout,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

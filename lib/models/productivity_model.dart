@@ -11,11 +11,19 @@ class ProductivityModel extends HiveObject {
   bool isCompleted;
 
   @HiveField(2)
-  String userId; // ← Tambahan penting
+  String userEmail; // ✅ ganti dari userId
+
+  @HiveField(3)
+  DateTime createdAt;
+
+  @HiveField(4)
+  DateTime? deadline; // Optional deadline
 
   ProductivityModel({
     required this.task,
     this.isCompleted = false,
-    required this.userId,
+    required this.userEmail, // ✅ ganti dari userId
+    required this.createdAt,
+    this.deadline,
   });
 }
